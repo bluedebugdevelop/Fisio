@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Especificación — Software de Gestión para Clínicas de Fisioterapia</title>
+<style>
+  :root{
+    --azul:#1f6feb; --azul-osc:#0d3b8c; --tinta:#1a1f2b; --gris:#5b6472;
+    --linea:#e3e7ee; --fondo:#f7f9fc; --verde:#1a9c6b; --ambar:#c77700; --rojo:#c0392b;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--tinta); margin:0; background:var(--fondo); line-height:1.6;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px 80px}
+  header.hero{
+    background:linear-gradient(135deg,var(--azul-osc),var(--azul));
+    color:#fff; padding:56px 24px 48px; text-align:center;
+  }
+  header.hero h1{margin:0 0 10px; font-size:32px; line-height:1.2}
+  header.hero p{margin:4px auto; max-width:640px; opacity:.92; font-size:16px}
+  .badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:4px 12px; border-radius:999px; font-size:13px; margin-top:14px; letter-spacing:.3px}
+  h2{font-size:24px; margin:48px 0 8px; padding-top:16px; border-top:3px solid var(--azul); display:inline-block}
+  h3{font-size:18px; margin:28px 0 6px; color:var(--azul-osc)}
+  h4{font-size:15px; margin:18px 0 4px; text-transform:uppercase; letter-spacing:.5px; color:var(--gris)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px; padding-left:22px}
+  li{margin:5px 0}
+  code{background:#eef1f6; padding:2px 6px; border-radius:5px; font-size:13px; color:var(--azul-osc)}
+  .card{background:var(--card); border:1px solid var(--linea); border-radius:12px; padding:22px 24px; margin:16px 0;
+    box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin:16px 0}
+  .pill{display:inline-block; font-size:12px; font-weight:600; padding:3px 10px; border-radius:999px; margin-right:6px}
+  .p-must{background:#fde8e6; color:var(--rojo)}
+  .p-should{background:#fff2da; color:var(--ambar)}
+  .p-nice{background:#e3f6ee; color:var(--verde)}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; background:#fff}
+  th,td{border:1px solid var(--linea); padding:10px 12px; text-align:left; vertical-align:top}
+  th{background:#f0f4fa; font-weight:600}
+  .callout{border-left:4px solid var(--azul); background:#eef4ff; padding:14px 18px; border-radius:0 10px 10px 0; margin:16px 0}
+  .callout.warn{border-color:var(--ambar); background:#fff8ec}
+  .callout.legal{border-color:var(--rojo); background:#fdeeec}
+  .toc{background:#fff; border:1px solid var(--linea); border-radius:12px; padding:20px 24px; margin:28px 0}
+  .toc ol{columns:2; column-gap:32px}
+  .toc a{color:var(--azul-osc); text-decoration:none}
+  .toc a:hover{text-decoration:underline}
+  .step{display:flex; gap:16px; margin:18px 0; align-items:flex-start}
+  .step .n{flex:none; width:38px; height:38px; border-radius:50%; background:var(--azul); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:17px}
+  .step .body{flex:1}
+  .muted{color:var(--gris); font-size:14px}
+  footer{text-align:center; color:var(--gris); font-size:13px; margin-top:60px; padding-top:24px; border-top:1px solid var(--linea)}
+  .tag{font-size:12px; background:#eef1f6; color:var(--gris); padding:2px 8px; border-radius:6px; margin-left:6px}
+  @media print{
+    body{background:#fff} header.hero{background:var(--azul-osc)!important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+    .card,.callout,table{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>Software de Gestión para Clínicas de Fisioterapia</h1>
+  <p>Documento de especificación funcional y técnica para el equipo de desarrollo.</p>
+  <p>Módulos: CRM &middot; Historia Clínica Electrónica &middot; Agenda &middot; Portal del Paciente</p>
+  <span class="badge">v1.0 &middot; Documento de partida para desarrollo</span>
+</header>
+
+<div class="wrap">
+
+<div class="callout">
+  <strong>Cómo leer este documento.</strong> Está pensado para que el equipo que va a programar la app tenga claro <em>qué</em> construir, <em>en qué orden</em> y <em>con qué reglas</em>. No fija el código línea a línea; fija el alcance, el modelo de datos, las fases y los requisitos legales (que en una app de salud no son opcionales).
+</div>
+
+<div class="toc">
+  <h4 style="margin-top:0">Índice</h4>
+  <ol>
+    <li><a href="#que-es">1. Qué es exactamente (categoría del producto)</a></li>
+    <li><a href="#usuarios">2. Usuarios y roles</a></li>
+    <li><a href="#funciones">3. Funcionalidades (con prioridad)</a></li>
+    <li><a href="#datos">4. Modelo de datos</a></li>
+    <li><a href="#legal">5. Requisitos legales (RGPD / datos de salud)</a></li>
+    <li><a href="#stack">6. Stack tecnológico recomendado</a></li>
+    <li><a href="#fases">7. Fases de construcción (roadmap)</a></li>
+    <li><a href="#mvp">8. Alcance del MVP</a></li>
+    <li><a href="#nofunc">9. Requisitos no funcionales</a></li>
+    <li><a href="#decisiones">10. Decisiones pendientes de cerrar</a></li>
+  </ol>
+</div>
+
+<h2 id="que-es">1. Qué es exactamente</h2>
+<p>Aunque se hable de "CRM", lo que se describe es algo más amplio. La categoría real del producto es:</p>
+<div class="card">
+  <h3 style="margin-top:0">Software de Gestión para Clínicas de Fisioterapia</h3>
+  <p class="muted">(en inglés: <em>Physiotherapy / Healthcare Practice Management Software</em>)</p>
+  <p>Es la unión de cuatro piezas que normalmente van separadas:</p>
+  <div class="grid">
+    <div>
+      <h4>CRM</h4>
+      <p>Gestión de pacientes como "clientes": datos de contacto, captación, seguimiento, comunicación.</p>
+    </div>
+    <div>
+      <h4>Historia Clínica Electrónica (HCE / EHR)</h4>
+      <p>Las "fichas": diagnóstico, lesiones, evolución de cada sesión, documentos. <strong>Es dato de salud.</strong></p>
+    </div>
+    <div>
+      <h4>Agenda y Reservas</h4>
+      <p>Calendario de citas, cuadrante/horario por fisio y por sala, recordatorios automáticos.</p>
+    </div>
+    <div>
+      <h4>Portal del Paciente</h4>
+      <p>Acceso del paciente para ver sus citas y chatear con su fisio.</p>
+    </div>
+  </div>
+</div>
+<div class="callout warn">
+  <strong>Implicación clave.</strong> En cuanto guardamos historial clínico, esto deja de ser "una agenda" y pasa a ser una <strong>aplicación de salud</strong>. Eso obliga a cumplir RGPD con datos de categoría especial (ver sección 5). Hay que asumirlo desde el día 1, no añadirlo al final.
+</div>
+
+<h2 id="usuarios">2. Usuarios y roles</h2>
+<table>
+  <tr><th>Rol</th><th>Quién es</th><th>Qué puede hacer</th></tr>
+  <tr><td><strong>Administrador de clínica</strong></td><td>Dueño/gerente del centro</td><td>Gestiona fisios, salas, horarios, facturación, ve todas las agendas y estadísticas.</td></tr>
+  <tr><td><strong>Fisioterapeuta</strong></td><td>Profesional</td><td>Ve su agenda, gestiona las fichas de sus pacientes, registra sesiones, responde al chat.</td></tr>
+  <tr><td><strong>Recepción</strong> <span class="tag">opcional</span></td><td>Personal de mostrador</td><td>Crea y mueve citas, da de alta pacientes. <em>No</em> ve el detalle clínico.</td></tr>
+  <tr><td><strong>Paciente</strong></td><td>Cliente del centro</td><td>Pide/consulta sus citas, recibe recordatorios, chatea con su fisio, ve sus documentos.</td></tr>
+</table>
+<div class="callout">
+  Un centro puede tener varios fisios → la app debe ser <strong>multi-clínica y multi-profesional</strong> desde el modelo de datos, aunque al principio se venda a una sola clínica.
+</div>
+
+<h2 id="funciones">3. Funcionalidades</h2>
+<p>Prioridad: <span class="pill p-must">Imprescindible</span> <span class="pill p-should">Importante</span> <span class="pill p-nice">Deseable</span></p>
+
+<h3>3.1 Agenda y citas</h3>
+<ul>
+  <li><span class="pill p-must">Imprescindible</span> Calendario por fisio, por sala y vista global del centro (día / semana / mes).</li>
+  <li><span class="pill p-must">Imprescindible</span> Crear, mover, duplicar y cancelar citas. Duración configurable por tipo de sesión.</li>
+  <li><span class="pill p-must">Imprescindible</span> Vista de "cuadrante/horario" del centro: quién está ocupado, huecos libres.</li>
+  <li><span class="pill p-should">Importante</span> Estados de cita: pendiente, confirmada, realizada, no presentada (<em>no-show</em>), cancelada.</li>
+  <li><span class="pill p-should">Importante</span> Evitar solapamientos (no dos citas en la misma sala/fisio a la vez).</li>
+  <li><span class="pill p-nice">Deseable</span> Reserva online: el paciente pide cita desde su portal según huecos disponibles.</li>
+</ul>
+
+<h3>3.2 Recordatorios y avisos</h3>
+<ul>
+  <li><span class="pill p-must">Imprescindible</span> Recordatorio automático de cita al paciente (24 h antes y/o 2 h antes).</li>
+  <li><span class="pill p-should">Importante</span> Canales: email siempre; <strong>WhatsApp / SMS</strong> muy recomendado (los fisios lo piden).</li>
+  <li><span class="pill p-should">Importante</span> Aviso al fisio de su próxima cita y de cancelaciones.</li>
+  <li><span class="pill p-nice">Deseable</span> Confirmación de cita por el paciente con un clic en el mensaje.</li>
+</ul>
+
+<h3>3.3 Fichas / Historia Clínica</h3>
+<ul>
+  <li><span class="pill p-must">Imprescindible</span> Ficha por paciente: datos personales, contacto, consentimientos.</li>
+  <li><span class="pill p-must">Imprescindible</span> Historial clínico: motivo de consulta, diagnóstico, antecedentes, evolución.</li>
+  <li><span class="pill p-must">Imprescindible</span> Nota de sesión: qué se hizo cada día, vinculada a la cita correspondiente.</li>
+  <li><span class="pill p-should">Importante</span> Adjuntar documentos: informes, pruebas de imagen, consentimientos firmados.</li>
+  <li><span class="pill p-nice">Deseable</span> Plantillas de valoración (escalas de dolor, rango de movimiento, tests).</li>
+  <li><span class="pill p-nice">Deseable</span> Ejercicios/pautas para casa enviadas al paciente.</li>
+</ul>
+
+<h3>3.4 Chat paciente ↔ fisio</h3>
+<ul>
+  <li><span class="pill p-should">Importante</span> Mensajería 1 a 1 entre paciente y su fisio para resolver dudas.</li>
+  <li><span class="pill p-should">Importante</span> Aviso de mensaje nuevo (notificación / email).</li>
+  <li><span class="pill p-nice">Deseable</span> Adjuntar imágenes (ej. el paciente muestra la zona de dolor).</li>
+  <li><span class="pill p-nice">Deseable</span> Horario de atención / aviso de "esto no sustituye urgencias".</li>
+</ul>
+<div class="callout warn">
+  El chat de una app de salud genera <strong>datos clínicos</strong> y expectativa de respuesta. Hay que dejar claro al paciente que no es un canal de urgencias y guardar los mensajes con el mismo nivel de protección que la ficha.
+</div>
+
+<h3>3.5 Administración y negocio <span class="tag">fase posterior</span></h3>
+<ul>
+  <li><span class="pill p-nice">Deseable</span> Facturación / tickets, bonos de sesiones, control de pagos.</li>
+  <li><span class="pill p-nice">Deseable</span> Estadísticas: ocupación, no-shows, pacientes nuevos, ingresos.</li>
+  <li><span class="pill p-nice">Deseable</span> Gestión de bonos (ej. "paquete de 10 sesiones").</li>
+</ul>
+
+<h2 id="datos">4. Modelo de datos</h2>
+<p>Entidades mínimas y cómo se relacionan. Sirve para diseñar la base de datos.</p>
+<table>
+  <tr><th>Entidad</th><th>Campos clave</th><th>Relaciones</th></tr>
+  <tr><td><strong>Clínica</strong></td><td>nombre, dirección, CIF, horario</td><td>tiene muchos Profesionales y Salas</td></tr>
+  <tr><td><strong>Usuario</strong></td><td>email, rol, contraseña (hash)</td><td>es admin / fisio / recepción / paciente</td></tr>
+  <tr><td><strong>Profesional (Fisio)</strong></td><td>nº colegiado, especialidad, horario laboral</td><td>pertenece a Clínica; tiene Citas</td></tr>
+  <tr><td><strong>Paciente</strong></td><td>nombre, DNI, fecha nac., teléfono, consentimientos</td><td>pertenece a Clínica; tiene Historia y Citas</td></tr>
+  <tr><td><strong>Sala / Recurso</strong></td><td>nombre, tipo</td><td>pertenece a Clínica; se asigna a Citas</td></tr>
+  <tr><td><strong>Cita</strong></td><td>fecha/hora inicio y fin, estado, tipo</td><td>Paciente + Profesional + Sala</td></tr>
+  <tr><td><strong>Historia clínica</strong></td><td>diagnóstico, antecedentes</td><td>1 por Paciente</td></tr>
+  <tr><td><strong>Nota de sesión</strong></td><td>fecha, contenido, evolución</td><td>pertenece a Historia y a una Cita</td></tr>
+  <tr><td><strong>Documento</strong></td><td>archivo, tipo, fecha</td><td>pertenece a Paciente</td></tr>
+  <tr><td><strong>Mensaje (chat)</strong></td><td>texto, fecha, leído</td><td>entre Paciente y Profesional</td></tr>
+  <tr><td><strong>Recordatorio</strong></td><td>canal, fecha envío, estado</td><td>pertenece a una Cita</td></tr>
+</table>
+
+<h2 id="legal">5. Requisitos legales — NO opcionales</h2>
+<div class="callout legal">
+  <strong>Esto es lo que más se subestima y lo que puede hundir el proyecto.</strong> Una app que guarda historiales de salud en España maneja "datos de categoría especial" (art. 9 RGPD). Hay que diseñarlo cumpliendo desde el principio.
+</div>
+<ul>
+  <li><strong>RGPD + LOPDGDD:</strong> base legal, consentimiento explícito del paciente, derecho de acceso/borrado.</li>
+  <li><strong>Datos de salud cifrados</strong> en tránsito (HTTPS obligatorio) y en reposo (base de datos cifrada).</li>
+  <li><strong>Control de acceso por rol:</strong> un fisio solo ve a sus pacientes; recepción no ve el detalle clínico.</li>
+  <li><strong>Registro de accesos (audit log):</strong> quién vio/editó qué ficha y cuándo.</li>
+  <li><strong>Contrato de Encargado de Tratamiento</strong> con el hosting/proveedores (que estén en la UE preferiblemente).</li>
+  <li><strong>Consentimientos:</strong> guardar el consentimiento informado y el de comunicaciones (recordatorios WhatsApp/email).</li>
+  <li><strong>Copias de seguridad</strong> cifradas y plan de recuperación.</li>
+</ul>
+<div class="callout warn">Recomendación: contar con un asesor en protección de datos antes de captar el primer paciente real. No es coste opcional, es parte del producto.</div>
+
+<h2 id="stack">6. Stack tecnológico recomendado</h2>
+<p class="muted">Propuesta orientativa para un equipo pequeño que quiere ir rápido y seguro. El equipo puede ajustar según lo que dominen.</p>
+<table>
+  <tr><th>Capa</th><th>Recomendado</th><th>Por qué</th></tr>
+  <tr><td>Frontend web</td><td>Next.js (React) + TypeScript</td><td>Panel de clínica y portal de paciente en la misma base.</td></tr>
+  <tr><td>App móvil <span class="tag">opcional</span></td><td>React Native / Expo</td><td>Reutiliza conocimiento de React; útil para el paciente y notificaciones push.</td></tr>
+  <tr><td>Backend + BBDD + Auth</td><td>Supabase (PostgreSQL)</td><td>Auth con roles, base de datos relacional, almacenamiento de archivos y permisos por fila (RLS) — encaja muy bien con el control de acceso clínico.</td></tr>
+  <tr><td>Recordatorios email</td><td>Resend / SendGrid</td><td>Envío fiable y con plantillas.</td></tr>
+  <tr><td>WhatsApp / SMS</td><td>Twilio o WhatsApp Business API</td><td>Canal que los fisios piden de verdad.</td></tr>
+  <tr><td>Chat tiempo real</td><td>Supabase Realtime</td><td>Mensajería sin montar infraestructura aparte.</td></tr>
+  <tr><td>Hosting</td><td>Vercel (front) + Supabase (datos, UE)</td><td>Rápido de desplegar; datos en región europea por RGPD.</td></tr>
+</table>
+<div class="callout">
+  <strong>Alternativa "todo en casa":</strong> si el equipo prefiere control total, backend propio (Node/NestJS o Django) + PostgreSQL + autenticación propia. Más trabajo, más control. La opción Supabase es la vía rápida para validar el producto.
+</div>
+
+<h2 id="fases">7. Fases de construcción (roadmap)</h2>
+
+<div class="step"><div class="n">0</div><div class="body">
+  <h3 style="margin-top:0">Fase 0 — Cimientos y legal</h3>
+  <ul>
+    <li>Decidir stack y crear el proyecto, repositorio Git y entornos.</li>
+    <li>Modelo de datos (sección 4) y autenticación con roles.</li>
+    <li>Definir el plan de RGPD y dónde se alojan los datos (UE).</li>
+  </ul>
+</div></div>
+
+<div class="step"><div class="n">1</div><div class="body">
+  <h3 style="margin-top:0">Fase 1 — Agenda (el corazón)</h3>
+  <ul>
+    <li>Alta de clínica, fisios, salas y pacientes.</li>
+    <li>Calendario con creación/edición de citas y vista de cuadrante del centro.</li>
+    <li>Control de solapamientos y estados de cita.</li>
+  </ul>
+</div></div>
+
+<div class="step"><div class="n">2</div><div class="body">
+  <h3 style="margin-top:0">Fase 2 — Recordatorios</h3>
+  <ul>
+    <li>Recordatorio automático por email.</li>
+    <li>Integración de WhatsApp/SMS.</li>
+    <li>Plantillas de mensaje y registro de envíos.</li>
+  </ul>
+</div></div>
+
+<div class="step"><div class="n">3</div><div class="body">
+  <h3 style="margin-top:0">Fase 3 — Fichas / Historia clínica</h3>
+  <ul>
+    <li>Ficha de paciente e historial.</li>
+    <li>Nota de sesión vinculada a cada cita.</li>
+    <li>Subida de documentos con almacenamiento seguro.</li>
+  </ul>
+</div></div>
+
+<div class="step"><div class="n">4</div><div class="body">
+  <h3 style="margin-top:0">Fase 4 — Portal del paciente + chat</h3>
+  <ul>
+    <li>Login del paciente y vista de sus citas.</li>
+    <li>Chat 1 a 1 con su fisio y notificaciones.</li>
+    <li>(Opcional) reserva de cita online.</li>
+  </ul>
+</div></div>
+
+<div class="step"><div class="n">5</div><div class="body">
+  <h3 style="margin-top:0">Fase 5 — Negocio</h3>
+  <ul>
+    <li>Facturación, bonos de sesiones y pagos.</li>
+    <li>Estadísticas e informes para el gerente.</li>
+  </ul>
+</div></div>
+
+<h2 id="mvp">8. Alcance del MVP (primera versión vendible)</h2>
+<div class="card">
+  <p>Para tener algo usable cuanto antes y enseñárselo a una clínica real, el MVP debería ser <strong>Fases 0 + 1 + 2 + lo básico de 3</strong>:</p>
+  <ul>
+    <li>Agenda completa con cuadrante del centro. <span class="pill p-must">Imprescindible</span></li>
+    <li>Gestión de pacientes y fisios. <span class="pill p-must">Imprescindible</span></li>
+    <li>Recordatorios de cita (email + WhatsApp). <span class="pill p-must">Imprescindible</span></li>
+    <li>Ficha de paciente con notas de sesión. <span class="pill p-must">Imprescindible</span></li>
+  </ul>
+  <p class="muted">El chat y el portal del paciente (Fase 4) son lo que diferencia el producto, pero llegan <em>después</em> de que la agenda funcione sólida. Una agenda con recordatorios ya resuelve el 80% del dolor del día a día de la clínica.</p>
+</div>
+
+<h2 id="nofunc">9. Requisitos no funcionales</h2>
+<ul>
+  <li><strong>Responsive:</strong> la clínica usa ordenador/tablet; el paciente, el móvil.</li>
+  <li><strong>Seguridad:</strong> HTTPS, contraseñas con hash, sesiones seguras, copias de seguridad.</li>
+  <li><strong>Rendimiento:</strong> el calendario debe abrir rápido aunque tenga muchas citas.</li>
+  <li><strong>Disponibilidad:</strong> si la agenda se cae, la clínica se para — fiabilidad alta.</li>
+  <li><strong>Idioma:</strong> español. Dejar preparado para más idiomas si se quiere crecer.</li>
+</ul>
+
+<h2 id="decisiones">10. Decisiones pendientes de cerrar antes de programar</h2>
+<table>
+  <tr><th>Pregunta</th><th>Por qué importa</th></tr>
+  <tr><td>¿Una sola clínica o varias (modelo SaaS)?</td><td>Cambia el diseño de la base de datos y los permisos.</td></tr>
+  <tr><td>¿Hace falta app móvil nativa o basta web responsive?</td><td>Afecta al coste y a las notificaciones push.</td></tr>
+  <tr><td>¿WhatsApp es obligatorio en el MVP?</td><td>Implica coste por mensaje y aprobación de plantillas en Meta.</td></tr>
+  <tr><td>¿El paciente pide cita online o solo la clínica?</td><td>La reserva online añade bastante complejidad.</td></tr>
+  <tr><td>¿Quién será el responsable de protección de datos?</td><td>Obligatorio definirlo antes de tratar datos reales.</td></tr>
+  <tr><td>¿Modelo de negocio: cuota por clínica, por fisio, por paciente?</td><td>Orienta qué medir y qué facturar.</td></tr>
+</table>
+
+<footer>
+  Documento de especificación &middot; Software de Gestión para Clínicas de Fisioterapia &middot; v1.0<br>
+  Preparado como punto de partida para el equipo de desarrollo. Ajustable según necesidades del centro.
+</footer>
+
+</div>
+</body>
+</html>
