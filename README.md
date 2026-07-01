@@ -74,7 +74,7 @@ pnpm build       # build de producción
 
 1. **Importa el repo en Vercel.**
 2. **Variables de entorno**: pega las mismas que en `.env.local`, ajustando `NEXT_PUBLIC_APP_URL` al dominio definitivo.
-3. **Cron Jobs**: Vercel detecta `vercel.json` y crea el cron de recordatorios (cada 5 min).
+3. **Cron Jobs**: Vercel detecta `vercel.json` y crea el cron de recordatorios (diario). En plan Pro puedes bajarlo a `*/5 * * * *`.
 4. **Deploy.** Verifica que `/panel` carga, signup funciona y los datos llegan a Supabase.
 
 ## Estructura
