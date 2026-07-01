@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest"
 import {
+  buildDuplicatedAppointmentDraft,
   canTransitionStatus, type AppointmentStatus,
+  getCalendarLoadRange,
   hasOverlap, validateAppointmentTimes,
 } from "./appointment-rules"
 
@@ -53,5 +55,66 @@ describe("hasOverlap", () => {
   })
   it("returns false for disjoint ranges", () => {
     expect(hasOverlap(A, { starts_at: "2026-06-10T12:00:00Z", ends_at: "2026-06-10T13:00:00Z" })).toBe(false)
+  })
+})
+
+describe("buildDuplicatedAppointmentDraft", () => {
+  it("shifts a copied appointment one week later and keeps appointment fields", () => {
+    const draft = buildDuplicatedAppointmentDraft({
+      patient_id: "patient-1",
+      professional_id: "professional-1",
+      room_id: "room-1",
+      service_type_id: "service-1",
+      starts_at: "2026-07-01T08:00:00.000Z",
+      ends_at: "2026-07-01T08:45:00.000Z",
+      notes_for_reception: "Trae informe",
+      patients: { id: "patient-1", first_name: "Ana", last_name: "Lopez" },
+      professionals: { id: "professional-1", display_name: "Elena", color: "#1f6feb" },
+      rooms: { id: "room-1", name: "Sala 1" },
+      service_types: { id: "service-1", name: "Seguimiento", color: "#1f6feb" },
+    })
+
+    expect(draft).toMatchObject({
+      patient_id: "patient-1",
+      professional_id: "professional-1",
+      room_id: "room-1",
+      service_type_id: "service-1",
+      starts_at: "2026-07-08T08:00:00.000Z",
+      ends_at: "2026-07-08T08:45:00.000Z",
+      notes_for_reception: "Trae informe",
+      patients: { first_name: "Ana", last_name: "Lopez" },
+    })
+  })
+})
+
+describe("getCalendarLoadRange", () => {
+  const focus = new Date(2026, 6, 15, 12, 0, 0)
+
+  it("loads only the focused day for day views", () => {
+    const range = getCalendarLoadRange(focus, "resourceTimeGridDay")
+    expect(range.from.getFullYear()).toBe(2026)
+    expect(range.from.getMonth()).toBe(6)
+    expect(range.from.getDate()).toBe(15)
+    expect(range.from.getHours()).toBe(0)
+    expect(range.to.getDate()).toBe(16)
+    expect(range.to.getHours()).toBe(0)
+  })
+
+  it("loads monday-to-monday for week views", () => {
+    const range = getCalendarLoadRange(focus, "resourceTimeGridWeek")
+    expect(range.from.getDay()).toBe(1)
+    expect(range.from.getDate()).toBe(13)
+    expect(range.to.getDay()).toBe(1)
+    expect(range.to.getDate()).toBe(20)
+  })
+
+  it("loads the visible month grid for month view", () => {
+    const range = getCalendarLoadRange(focus, "dayGridMonth")
+    expect(range.from.getDay()).toBe(1)
+    expect(range.from.getDate()).toBe(29)
+    expect(range.from.getMonth()).toBe(5)
+    expect(range.to.getDay()).toBe(1)
+    expect(range.to.getDate()).toBe(3)
+    expect(range.to.getMonth()).toBe(7)
   })
 })

@@ -15,6 +15,7 @@ import {
 } from "./actions"
 import { useRouter } from "next/navigation"
 import type { AppointmentEvent, AppointmentStatus } from "@/lib/db/appointments"
+import { buildDuplicatedAppointmentDraft } from "@/lib/domain/appointment-rules"
 
 type Professional = { id: string; display_name: string; default_appointment_minutes: number; is_active: boolean }
 type Room = { id: string; name: string; is_active: boolean }
@@ -36,7 +37,7 @@ function fromLocalInput(local: string) {
 }
 
 export function AppointmentDialog({
-  clinicId, mode, initial, professionals, rooms, serviceTypes, onClose,
+  clinicId, mode, initial, professionals, rooms, serviceTypes, onClose, onDuplicate,
 }: {
   clinicId: string
   mode: "create" | "edit"
@@ -45,6 +46,7 @@ export function AppointmentDialog({
   rooms: Room[]
   serviceTypes: ServiceType[]
   onClose: () => void
+  onDuplicate?: (initial: Partial<AppointmentEvent>) => void
 }) {
   const router = useRouter()
   const isEdit = mode === "edit"
@@ -154,7 +156,18 @@ export function AppointmentDialog({
           {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
 
           <DialogFooter className="gap-2 sm:gap-2">
-            {isEdit && <StatusButtons appointment={initial as AppointmentEvent} onChanged={() => { router.refresh(); onClose() }} />}
+            {isEdit && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onDuplicate?.(buildDuplicatedAppointmentDraft(initial as AppointmentEvent))}
+                >
+                  Duplicar
+                </Button>
+                <StatusButtons appointment={initial as AppointmentEvent} onChanged={() => { router.refresh(); onClose() }} />
+              </>
+            )}
             <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
             <Button type="submit" disabled={pending}>{pending ? "Guardando..." : "Guardar"}</Button>
           </DialogFooter>

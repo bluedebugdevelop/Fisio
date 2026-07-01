@@ -1,20 +1,19 @@
-import { startOfWeek, endOfWeek, addDays } from "date-fns"
 import { PageHeader } from "@/components/panel/PageHeader"
 import { requireActiveClinic } from "@/lib/auth/clinic-context"
 import { listAppointmentsInRange } from "@/lib/db/appointments"
 import { listProfessionals } from "@/lib/db/professionals"
 import { listRooms } from "@/lib/db/rooms"
 import { listServiceTypes } from "@/lib/db/service-types"
+import { getCalendarLoadRange } from "@/lib/domain/appointment-rules"
 import { CalendarView } from "./CalendarView"
 
 export default async function AgendaPage({
   searchParams,
-}: { searchParams: Promise<{ date?: string; professional?: string }> }) {
+}: { searchParams: Promise<{ date?: string; professional?: string; view?: string; resource?: string }> }) {
   const { active } = await requireActiveClinic()
   const sp = await searchParams
   const focus = sp.date ? new Date(sp.date) : new Date()
-  const from = startOfWeek(focus, { weekStartsOn: 1 })
-  const to = addDays(endOfWeek(focus, { weekStartsOn: 1 }), 1)
+  const { from, to } = getCalendarLoadRange(focus, sp.view)
 
   const ids = sp.professional?.split(",").filter(Boolean) ?? []
 
@@ -38,6 +37,8 @@ export default async function AgendaPage({
         rooms={rooms}
         serviceTypes={serviceTypes}
         selectedProfessionalIds={ids}
+        initialView={sp.view}
+        initialResourceMode={sp.resource}
       />
     </>
   )

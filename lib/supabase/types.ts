@@ -351,6 +351,57 @@ export type Database = {
           }
         ]
       }
+      patient_accounts: {
+        Row: {
+          id: string
+          clinic_id: string
+          patient_id: string
+          user_id: string
+          invited_by: string | null
+          invited_at: string
+          accepted_at: string | null
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          clinic_id: string
+          patient_id: string
+          user_id: string
+          invited_by?: string | null
+          invited_at?: string
+          accepted_at?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          clinic_id?: string
+          patient_id?: string
+          user_id?: string
+          invited_by?: string | null
+          invited_at?: string
+          accepted_at?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_accounts_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_accounts_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: true
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       clinic_consents: {
         Row: {
           id: string
@@ -928,6 +979,10 @@ export type Database = {
       current_user_role: {
         Args: { target_clinic: string }
         Returns: Database["public"]["Enums"]["member_role"] | null
+      }
+      current_patient_ids: {
+        Args: Record<string, never>
+        Returns: { patient_id: string }[]
       }
       get_invitation_preview: {
         Args: { p_token: string }

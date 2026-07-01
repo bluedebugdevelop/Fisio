@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { safeRedirectPath } from "@/lib/auth/redirects"
 
 const loginSchema = z.object({
   email: z.string().email("Email no válido"),
@@ -27,19 +28,20 @@ export async function loginAction(_prev: ActionState, formData: FormData): Promi
   const { error } = await supabase.auth.signInWithPassword(parsed.data)
   if (error) return { error: "Email o contraseña incorrectos." }
   revalidatePath("/", "layout")
-  redirect("/panel")
+  redirect(safeRedirectPath(formData.get("next"), "/panel"))
 }
 
 export async function signupAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = signupSchema.safeParse(Object.fromEntries(formData))
   if (!parsed.success) return { fieldErrors: parsed.error.flatten().fieldErrors }
   const supabase = await createSupabaseServerClient()
+  const next = safeRedirectPath(formData.get("next"), "/panel")
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
       data: { full_name: parsed.data.name },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=${encodeURIComponent(next)}`,
     },
   })
   if (error) return { error: error.message }
