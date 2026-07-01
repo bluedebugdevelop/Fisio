@@ -5,12 +5,38 @@ import {
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { logoutAction } from "@/app/(auth)/actions"
+import { MobileNav } from "./MobileNav"
+import type { Database } from "@/lib/supabase/types"
 
-export function PanelHeader({ email, name }: { email: string; name?: string }) {
+type Role = Database["public"]["Enums"]["member_role"]
+
+export function PanelHeader({
+  email,
+  name,
+  memberships,
+  activeId,
+  clinicName,
+  role,
+}: {
+  email: string
+  name?: string
+  memberships: { clinic_id: string; clinics: { id: string; name: string } | null }[]
+  activeId: string
+  clinicName: string
+  role: Role
+}) {
   const initials = (name ?? email).slice(0, 2).toUpperCase()
   return (
     <header className="flex h-14 items-center justify-between border-b bg-card px-4 md:px-6">
-      <div className="text-sm text-muted-foreground">Panel</div>
+      <div className="flex items-center gap-2">
+        <MobileNav
+          memberships={memberships}
+          activeId={activeId}
+          clinicName={clinicName}
+          role={role}
+        />
+        <div className="text-sm text-muted-foreground">Panel</div>
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="gap-2">

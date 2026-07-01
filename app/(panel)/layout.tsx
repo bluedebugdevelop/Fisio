@@ -18,6 +18,10 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         <PanelHeader
           email={user.email ?? ""}
           name={(user.user_metadata?.full_name as string | undefined) ?? undefined}
+          memberships={memberships}
+          activeId={active.clinic_id}
+          clinicName={clinicName}
+          role={active.role}
         />
         <main className="flex-1 overflow-y-auto">{children}</main>
         <LegalFooter />
